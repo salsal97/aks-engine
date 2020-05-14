@@ -53,12 +53,12 @@ const (
 	flannelInstallCNIImageReference                   string = "quay.io/coreos/flannel:v0.10.0-amd64"
 	KubeRBACProxyImageReference                       string = "gcr.io/kubebuilder/kube-rbac-proxy:v0.4.0"
 	ScheduledMaintenanceManagerImageReference         string = "quay.io/awesomenix/drainsafe-manager:latest"
-	nvidiaDevicePluginImageReference                  string = "k8s-device-plugin:1.11"
+	nvidiaDevicePluginImageReference                  string = "oss/nvidia/k8s-device-plugin:1.0.0-beta6"
 	virtualKubeletImageReference                      string = "virtual-kubelet:latest"
 	azureCNINetworkMonitorImageReference              string = "networkmonitor:v0.0.8"
 	tillerImageReference                              string = "oss/kubernetes/tiller:v2.13.1"
-	csiSecretsStoreProviderAzureImageReference        string = "k8s/csi/secrets-store/provider-azure:0.0.4"
-	csiSecretsStoreDriverImageReference               string = "k8s/csi/secrets-store/driver:v0.0.9"
+	csiSecretsStoreProviderAzureImageReference        string = "k8s/csi/secrets-store/provider-azure:0.0.5"
+	csiSecretsStoreDriverImageReference               string = "k8s/csi/secrets-store/driver:v0.0.10"
 	clusterProportionalAutoscalerImageReference       string = "mcr.microsoft.com/oss/kubernetes/autoscaler/cluster-proportional-autoscaler:1.7.1"
 )
 
@@ -415,6 +415,7 @@ func getK8sVersionComponents(version, kubernetesImageBaseType string, overrides 
 			common.CloudControllerManagerComponentName:        azureCloudControllerManagerImageReference,
 			common.CloudNodeManagerAddonName:                  azureCloudNodeManagerImageReference,
 			common.WindowsArtifactComponentName:               "v" + version + "/windowszip/v" + version + "-1int.zip",
+			common.WindowsArtifactAzureStackComponentName:     "v" + version + common.AzureStackSuffix + "/windowszip/v" + version + common.AzureStackSuffix + "-1int.zip",
 			common.DashboardAddonName:                         dashboardImageReference,
 			common.DashboardMetricsScraperContainerName:       dashboardMetricsScraperImageReference,
 			common.ExecHealthZComponentName:                   getDefaultImage(common.ExecHealthZComponentName, kubernetesImageBaseType),
@@ -498,6 +499,7 @@ func getK8sVersionComponents(version, kubernetesImageBaseType string, overrides 
 			common.CloudControllerManagerComponentName:        azureCloudControllerManagerImageReference,
 			common.CloudNodeManagerAddonName:                  azureCloudNodeManagerImageReference,
 			common.WindowsArtifactComponentName:               "v" + version + "/windowszip/v" + version + "-1int.zip",
+			common.WindowsArtifactAzureStackComponentName:     "v" + version + common.AzureStackSuffix + "/windowszip/v" + version + common.AzureStackSuffix + "-1int.zip",
 			common.DashboardAddonName:                         dashboardImageReference,
 			common.DashboardMetricsScraperContainerName:       dashboardMetricsScraperImageReference,
 			common.ExecHealthZComponentName:                   getDefaultImage(common.ExecHealthZComponentName, kubernetesImageBaseType),
@@ -581,6 +583,7 @@ func getK8sVersionComponents(version, kubernetesImageBaseType string, overrides 
 			common.CloudControllerManagerComponentName:        azureCloudControllerManagerImageReference,
 			common.CloudNodeManagerAddonName:                  azureCloudNodeManagerImageReference,
 			common.WindowsArtifactComponentName:               "v" + version + "/windowszip/v" + version + "-1int.zip",
+			common.WindowsArtifactAzureStackComponentName:     "v" + version + common.AzureStackSuffix + "/windowszip/v" + version + common.AzureStackSuffix + "-1int.zip",
 			common.DashboardAddonName:                         dashboardImageReference,
 			common.DashboardMetricsScraperContainerName:       dashboardMetricsScraperImageReference,
 			common.ExecHealthZComponentName:                   getDefaultImage(common.ExecHealthZComponentName, kubernetesImageBaseType),
@@ -660,6 +663,7 @@ func getK8sVersionComponents(version, kubernetesImageBaseType string, overrides 
 			common.CloudControllerManagerComponentName:        azureCloudControllerManagerImageReference,
 			common.CloudNodeManagerAddonName:                  azureCloudNodeManagerImageReference,
 			common.WindowsArtifactComponentName:               "v" + version + "/windowszip/v" + version + "-1int.zip",
+			common.WindowsArtifactAzureStackComponentName:     "v" + version + common.AzureStackSuffix + "/windowszip/v" + version + common.AzureStackSuffix + "-1int.zip",
 			common.DashboardAddonName:                         dashboardImageReference,
 			common.DashboardMetricsScraperContainerName:       dashboardMetricsScraperImageReference,
 			common.ExecHealthZComponentName:                   getDefaultImage(common.ExecHealthZComponentName, kubernetesImageBaseType),
@@ -736,6 +740,7 @@ func getK8sVersionComponents(version, kubernetesImageBaseType string, overrides 
 			common.KubeProxyAddonName:                         getDefaultImage(common.Hyperkube, kubernetesImageBaseType) + ":v" + version,
 			common.CloudControllerManagerComponentName:        k8sComponent[common.CloudControllerManagerComponentName] + ":v" + version,
 			common.WindowsArtifactComponentName:               "v" + version + "/windowszip/v" + version + "-1int.zip",
+			common.WindowsArtifactAzureStackComponentName:     "v" + version + common.AzureStackSuffix + "/windowszip/v" + version + common.AzureStackSuffix + "-1int.zip",
 			common.DashboardAddonName:                         dashboardImageReference,
 			common.DashboardMetricsScraperContainerName:       dashboardMetricsScraperImageReference,
 			common.ExecHealthZComponentName:                   getDefaultImage(common.ExecHealthZComponentName, kubernetesImageBaseType),
@@ -809,6 +814,7 @@ func getK8sVersionComponents(version, kubernetesImageBaseType string, overrides 
 			common.KubeProxyAddonName:                         getDefaultImage(common.Hyperkube, kubernetesImageBaseType) + ":v" + version,
 			common.CloudControllerManagerComponentName:        k8sComponent[common.CloudControllerManagerComponentName] + ":v" + version,
 			common.WindowsArtifactComponentName:               "v" + version + "/windowszip/v" + version + "-1int.zip",
+			common.WindowsArtifactAzureStackComponentName:     "v" + version + common.AzureStackSuffix + "/windowszip/v" + version + common.AzureStackSuffix + "-1int.zip",
 			common.DashboardAddonName:                         dashboardImageReference,
 			common.DashboardMetricsScraperContainerName:       dashboardMetricsScraperImageReference,
 			common.ExecHealthZComponentName:                   getDefaultImage(common.ExecHealthZComponentName, kubernetesImageBaseType),
@@ -882,6 +888,7 @@ func getK8sVersionComponents(version, kubernetesImageBaseType string, overrides 
 			common.KubeProxyAddonName:                         getDefaultImage(common.Hyperkube, kubernetesImageBaseType) + ":v" + version,
 			common.CloudControllerManagerComponentName:        k8sComponent[common.CloudControllerManagerComponentName] + ":v" + version,
 			common.WindowsArtifactComponentName:               "v" + version + "/windowszip/v" + version + "-1int.zip",
+			common.WindowsArtifactAzureStackComponentName:     "v" + version + common.AzureStackSuffix + "/windowszip/v" + version + common.AzureStackSuffix + "-1int.zip",
 			common.DashboardAddonName:                         dashboardImageReference,
 			common.ExecHealthZComponentName:                   getDefaultImage(common.ExecHealthZComponentName, kubernetesImageBaseType),
 			common.AddonResizerComponentName:                  k8sComponent[common.AddonResizerComponentName],
@@ -1140,7 +1147,7 @@ func getK8sVersionComponents(version, kubernetesImageBaseType string, overrides 
 			"ratelimitbucketwrite":                            strconv.Itoa(DefaultKubernetesCloudProviderRateLimitBucketWrite),
 			"gchighthreshold":                                 strconv.Itoa(DefaultKubernetesGCHighThreshold),
 			"gclowthreshold":                                  strconv.Itoa(DefaultKubernetesGCLowThreshold),
-			common.NVIDIADevicePluginAddonName:                "k8s-device-plugin:1.10",
+			common.NVIDIADevicePluginAddonName:                nvidiaDevicePluginImageReference,
 		}
 	case "1.9":
 		ret = map[string]string{

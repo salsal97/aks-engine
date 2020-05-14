@@ -50,7 +50,6 @@
 // ../../parts/k8s/addons/1.16/kubernetesmasteraddons-kube-dns-deployment.yaml
 // ../../parts/k8s/addons/1.16/kubernetesmasteraddons-kube-proxy-daemonset.yaml
 // ../../parts/k8s/addons/1.16/kubernetesmasteraddons-kube-rescheduler-deployment.yaml
-// ../../parts/k8s/addons/1.16/kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml
 // ../../parts/k8s/addons/1.16/kubernetesmasteraddons-pod-security-policy.yaml
 // ../../parts/k8s/addons/1.16/kubernetesmasteraddons-smb-flexvolume-installer.yaml
 // ../../parts/k8s/addons/1.16/kubernetesmasteraddons-tiller-deployment.yaml
@@ -70,7 +69,6 @@
 // ../../parts/k8s/addons/1.17/kubernetesmasteraddons-kube-dns-deployment.yaml
 // ../../parts/k8s/addons/1.17/kubernetesmasteraddons-kube-proxy-daemonset.yaml
 // ../../parts/k8s/addons/1.17/kubernetesmasteraddons-kube-rescheduler-deployment.yaml
-// ../../parts/k8s/addons/1.17/kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml
 // ../../parts/k8s/addons/1.17/kubernetesmasteraddons-pod-security-policy.yaml
 // ../../parts/k8s/addons/1.17/kubernetesmasteraddons-smb-flexvolume-installer.yaml
 // ../../parts/k8s/addons/1.17/kubernetesmasteraddons-tiller-deployment.yaml
@@ -90,7 +88,6 @@
 // ../../parts/k8s/addons/1.18/kubernetesmasteraddons-kube-dns-deployment.yaml
 // ../../parts/k8s/addons/1.18/kubernetesmasteraddons-kube-proxy-daemonset.yaml
 // ../../parts/k8s/addons/1.18/kubernetesmasteraddons-kube-rescheduler-deployment.yaml
-// ../../parts/k8s/addons/1.18/kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml
 // ../../parts/k8s/addons/1.18/kubernetesmasteraddons-pod-security-policy.yaml
 // ../../parts/k8s/addons/1.18/kubernetesmasteraddons-smb-flexvolume-installer.yaml
 // ../../parts/k8s/addons/1.18/kubernetesmasteraddons-tiller-deployment.yaml
@@ -110,7 +107,6 @@
 // ../../parts/k8s/addons/1.19/kubernetesmasteraddons-kube-dns-deployment.yaml
 // ../../parts/k8s/addons/1.19/kubernetesmasteraddons-kube-proxy-daemonset.yaml
 // ../../parts/k8s/addons/1.19/kubernetesmasteraddons-kube-rescheduler-deployment.yaml
-// ../../parts/k8s/addons/1.19/kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml
 // ../../parts/k8s/addons/1.19/kubernetesmasteraddons-pod-security-policy.yaml
 // ../../parts/k8s/addons/1.19/kubernetesmasteraddons-smb-flexvolume-installer.yaml
 // ../../parts/k8s/addons/1.19/kubernetesmasteraddons-tiller-deployment.yaml
@@ -139,12 +135,12 @@
 // ../../parts/k8s/addons/kubernetesmasteraddons-kube-dns-deployment.yaml
 // ../../parts/k8s/addons/kubernetesmasteraddons-kube-proxy-daemonset.yaml
 // ../../parts/k8s/addons/kubernetesmasteraddons-kube-rescheduler-deployment.yaml
-// ../../parts/k8s/addons/kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml
 // ../../parts/k8s/addons/kubernetesmasteraddons-pod-security-policy.yaml
 // ../../parts/k8s/addons/kubernetesmasteraddons-smb-flexvolume-installer.yaml
 // ../../parts/k8s/addons/kubernetesmasteraddons-tiller-deployment.yaml
 // ../../parts/k8s/addons/metrics-server.yaml
 // ../../parts/k8s/addons/node-problem-detector.yaml
+// ../../parts/k8s/addons/nvidia-device-plugin.yaml
 // ../../parts/k8s/addons/scheduled-maintenance-deployment.yaml
 // ../../parts/k8s/addons/secrets-store-csi-driver.yaml
 // ../../parts/k8s/armparameters.t
@@ -10535,84 +10531,6 @@ func k8sAddons116KubernetesmasteraddonsKubeReschedulerDeploymentYaml() (*asset, 
 	return a, nil
 }
 
-var _k8sAddons116KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml = []byte(`apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  labels:
-    k8s-app: nvidia-device-plugin
-    kubernetes.io/cluster-service: "true"
-    addonmanager.kubernetes.io/mode: Reconcile
-  name: nvidia-device-plugin
-  namespace: kube-system
-spec:
-  selector:
-    matchLabels:
-      k8s-app: nvidia-device-plugin
-  updateStrategy:
-    type: RollingUpdate
-  template:
-    metadata:
-      labels:
-        k8s-app: nvidia-device-plugin
-    spec:
-      priorityClassName: system-node-critical
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: accelerator
-                operator: In
-                values:
-                - nvidia
-      tolerations:
-      - key: CriticalAddonsOnly
-        operator: Exists
-      - key: nvidia.com/gpu
-        effect: NoSchedule
-        operator: Equal
-        value: "true"
-      containers:
-      - image: {{ContainerImage "nvidia-device-plugin"}}
-        name: nvidia-device-plugin-ctr
-        resources:
-          requests:
-            cpu: {{ContainerCPUReqs "nvidia-device-plugin"}}
-            memory: {{ContainerMemReqs "nvidia-device-plugin"}}
-          limits:
-            cpu: {{ContainerCPULimits "nvidia-device-plugin"}}
-            memory: {{ContainerMemLimits "nvidia-device-plugin"}}
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop: ["ALL"]
-        volumeMounts:
-          - name: device-plugin
-            mountPath: /var/lib/kubelet/device-plugins
-      volumes:
-        - name: device-plugin
-          hostPath:
-            path: /var/lib/kubelet/device-plugins
-      nodeSelector:
-        beta.kubernetes.io/os: linux
-        accelerator: nvidia
-`)
-
-func k8sAddons116KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYamlBytes() ([]byte, error) {
-	return _k8sAddons116KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml, nil
-}
-
-func k8sAddons116KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml() (*asset, error) {
-	bytes, err := k8sAddons116KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "k8s/addons/1.16/kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
 var _k8sAddons116KubernetesmasteraddonsPodSecurityPolicyYaml = []byte(`apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
@@ -14577,86 +14495,6 @@ func k8sAddons117KubernetesmasteraddonsKubeReschedulerDeploymentYaml() (*asset, 
 	}
 
 	info := bindataFileInfo{name: "k8s/addons/1.17/kubernetesmasteraddons-kube-rescheduler-deployment.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _k8sAddons117KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml = []byte(`apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  labels:
-    k8s-app: nvidia-device-plugin
-    kubernetes.io/cluster-service: "true"
-    addonmanager.kubernetes.io/mode: Reconcile
-  name: nvidia-device-plugin
-  namespace: kube-system
-spec:
-  selector:
-    matchLabels:
-      k8s-app: nvidia-device-plugin
-  updateStrategy:
-    type: RollingUpdate
-  template:
-    metadata:
-      labels:
-        k8s-app: nvidia-device-plugin
-      annotations:
-        cluster-autoscaler.kubernetes.io/daemonset-pod: "true"
-    spec:
-      priorityClassName: system-node-critical
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: accelerator
-                operator: In
-                values:
-                - nvidia
-      tolerations:
-      - key: CriticalAddonsOnly
-        operator: Exists
-      - key: nvidia.com/gpu
-        effect: NoSchedule
-        operator: Equal
-        value: "true"
-      containers:
-      - image: {{ContainerImage "nvidia-device-plugin"}}
-        name: nvidia-device-plugin-ctr
-        resources:
-          requests:
-            cpu: {{ContainerCPUReqs "nvidia-device-plugin"}}
-            memory: {{ContainerMemReqs "nvidia-device-plugin"}}
-          limits:
-            cpu: {{ContainerCPULimits "nvidia-device-plugin"}}
-            memory: {{ContainerMemLimits "nvidia-device-plugin"}}
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop: ["ALL"]
-        volumeMounts:
-          - name: device-plugin
-            mountPath: /var/lib/kubelet/device-plugins
-      volumes:
-        - name: device-plugin
-          hostPath:
-            path: /var/lib/kubelet/device-plugins
-      nodeSelector:
-        beta.kubernetes.io/os: linux
-        accelerator: nvidia
-`)
-
-func k8sAddons117KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYamlBytes() ([]byte, error) {
-	return _k8sAddons117KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml, nil
-}
-
-func k8sAddons117KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml() (*asset, error) {
-	bytes, err := k8sAddons117KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "k8s/addons/1.17/kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -18697,86 +18535,6 @@ func k8sAddons118KubernetesmasteraddonsKubeReschedulerDeploymentYaml() (*asset, 
 	return a, nil
 }
 
-var _k8sAddons118KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml = []byte(`apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  labels:
-    k8s-app: nvidia-device-plugin
-    kubernetes.io/cluster-service: "true"
-    addonmanager.kubernetes.io/mode: Reconcile
-  name: nvidia-device-plugin
-  namespace: kube-system
-spec:
-  selector:
-    matchLabels:
-      k8s-app: nvidia-device-plugin
-  updateStrategy:
-    type: RollingUpdate
-  template:
-    metadata:
-      labels:
-        k8s-app: nvidia-device-plugin
-      annotations:
-        cluster-autoscaler.kubernetes.io/daemonset-pod: "true"
-    spec:
-      priorityClassName: system-node-critical
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: accelerator
-                operator: In
-                values:
-                - nvidia
-      tolerations:
-      - key: CriticalAddonsOnly
-        operator: Exists
-      - key: nvidia.com/gpu
-        effect: NoSchedule
-        operator: Equal
-        value: "true"
-      containers:
-      - image: {{ContainerImage "nvidia-device-plugin"}}
-        name: nvidia-device-plugin-ctr
-        resources:
-          requests:
-            cpu: {{ContainerCPUReqs "nvidia-device-plugin"}}
-            memory: {{ContainerMemReqs "nvidia-device-plugin"}}
-          limits:
-            cpu: {{ContainerCPULimits "nvidia-device-plugin"}}
-            memory: {{ContainerMemLimits "nvidia-device-plugin"}}
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop: ["ALL"]
-        volumeMounts:
-          - name: device-plugin
-            mountPath: /var/lib/kubelet/device-plugins
-      volumes:
-        - name: device-plugin
-          hostPath:
-            path: /var/lib/kubelet/device-plugins
-      nodeSelector:
-        beta.kubernetes.io/os: linux
-        accelerator: nvidia
-`)
-
-func k8sAddons118KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYamlBytes() ([]byte, error) {
-	return _k8sAddons118KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml, nil
-}
-
-func k8sAddons118KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml() (*asset, error) {
-	bytes, err := k8sAddons118KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "k8s/addons/1.18/kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
 var _k8sAddons118KubernetesmasteraddonsPodSecurityPolicyYaml = []byte(`apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
@@ -22809,86 +22567,6 @@ func k8sAddons119KubernetesmasteraddonsKubeReschedulerDeploymentYaml() (*asset, 
 	}
 
 	info := bindataFileInfo{name: "k8s/addons/1.19/kubernetesmasteraddons-kube-rescheduler-deployment.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _k8sAddons119KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml = []byte(`apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  labels:
-    k8s-app: nvidia-device-plugin
-    kubernetes.io/cluster-service: "true"
-    addonmanager.kubernetes.io/mode: Reconcile
-  name: nvidia-device-plugin
-  namespace: kube-system
-spec:
-  selector:
-    matchLabels:
-      k8s-app: nvidia-device-plugin
-  updateStrategy:
-    type: RollingUpdate
-  template:
-    metadata:
-      labels:
-        k8s-app: nvidia-device-plugin
-      annotations:
-        cluster-autoscaler.kubernetes.io/daemonset-pod: "true"
-    spec:
-      priorityClassName: system-node-critical
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: accelerator
-                operator: In
-                values:
-                - nvidia
-      tolerations:
-      - key: CriticalAddonsOnly
-        operator: Exists
-      - key: nvidia.com/gpu
-        effect: NoSchedule
-        operator: Equal
-        value: "true"
-      containers:
-      - image: {{ContainerImage "nvidia-device-plugin"}}
-        name: nvidia-device-plugin-ctr
-        resources:
-          requests:
-            cpu: {{ContainerCPUReqs "nvidia-device-plugin"}}
-            memory: {{ContainerMemReqs "nvidia-device-plugin"}}
-          limits:
-            cpu: {{ContainerCPULimits "nvidia-device-plugin"}}
-            memory: {{ContainerMemLimits "nvidia-device-plugin"}}
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop: ["ALL"]
-        volumeMounts:
-          - name: device-plugin
-            mountPath: /var/lib/kubelet/device-plugins
-      volumes:
-        - name: device-plugin
-          hostPath:
-            path: /var/lib/kubelet/device-plugins
-      nodeSelector:
-        kubernetes.io/os: linux
-        accelerator: nvidia
-`)
-
-func k8sAddons119KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYamlBytes() ([]byte, error) {
-	return _k8sAddons119KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml, nil
-}
-
-func k8sAddons119KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml() (*asset, error) {
-	bytes, err := k8sAddons119KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "k8s/addons/1.19/kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -32104,86 +31782,6 @@ func k8sAddonsKubernetesmasteraddonsKubeReschedulerDeploymentYaml() (*asset, err
 	return a, nil
 }
 
-var _k8sAddonsKubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml = []byte(`apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  labels:
-    k8s-app: nvidia-device-plugin
-    kubernetes.io/cluster-service: "true"
-    addonmanager.kubernetes.io/mode: Reconcile
-  name: nvidia-device-plugin
-  namespace: kube-system
-spec:
-  selector:
-    matchLabels:
-      k8s-app: nvidia-device-plugin
-  updateStrategy:
-    type: RollingUpdate
-  template:
-    metadata:
-      annotations:
-        scheduler.alpha.kubernetes.io/critical-pod: ""
-      labels:
-        k8s-app: nvidia-device-plugin
-    spec:
-      priorityClassName: system-node-critical
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: accelerator
-                operator: In
-                values:
-                - nvidia
-      tolerations:
-      - key: CriticalAddonsOnly
-        operator: Exists
-      - key: nvidia.com/gpu
-        effect: NoSchedule
-        operator: Equal
-        value: "true"
-      containers:
-      - image: {{ContainerImage "nvidia-device-plugin"}}
-        name: nvidia-device-plugin-ctr
-        resources:
-          requests:
-            cpu: {{ContainerCPUReqs "nvidia-device-plugin"}}
-            memory: {{ContainerMemReqs "nvidia-device-plugin"}}
-          limits:
-            cpu: {{ContainerCPULimits "nvidia-device-plugin"}}
-            memory: {{ContainerMemLimits "nvidia-device-plugin"}}
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop: ["ALL"]
-        volumeMounts:
-          - name: device-plugin
-            mountPath: /var/lib/kubelet/device-plugins
-      volumes:
-        - name: device-plugin
-          hostPath:
-            path: /var/lib/kubelet/device-plugins
-      nodeSelector:
-        beta.kubernetes.io/os: linux
-        accelerator: nvidia
-`)
-
-func k8sAddonsKubernetesmasteraddonsNvidiaDevicePluginDaemonsetYamlBytes() ([]byte, error) {
-	return _k8sAddonsKubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml, nil
-}
-
-func k8sAddonsKubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml() (*asset, error) {
-	bytes, err := k8sAddonsKubernetesmasteraddonsNvidiaDevicePluginDaemonsetYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "k8s/addons/kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
 var _k8sAddonsKubernetesmasteraddonsPodSecurityPolicyYaml = []byte(`apiVersion: extensions/v1beta1
 kind: PodSecurityPolicy
 metadata:
@@ -32822,6 +32420,96 @@ func k8sAddonsNodeProblemDetectorYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "k8s/addons/node-problem-detector.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _k8sAddonsNvidiaDevicePluginYaml = []byte(`apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    k8s-app: nvidia-device-plugin
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+  name: nvidia-device-plugin
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      k8s-app: nvidia-device-plugin
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+{{- if not (IsKubernetesVersionGe "1.16.0")}}
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ""
+{{- end}}
+{{- if IsKubernetesVersionGe "1.17.0"}}
+      annotations:
+        cluster-autoscaler.kubernetes.io/daemonset-pod: "true"
+{{- end}}
+      labels:
+        k8s-app: nvidia-device-plugin
+    spec:
+      priorityClassName: system-node-critical
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: accelerator
+                operator: In
+                values:
+                - nvidia
+      tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - key: nvidia.com/gpu
+        effect: NoSchedule
+        operator: Equal
+        value: "true"
+      containers:
+      - image: {{ContainerImage "nvidia-device-plugin"}}
+        name: nvidia-device-plugin-ctr
+        resources:
+          requests:
+            cpu: {{ContainerCPUReqs "nvidia-device-plugin"}}
+            memory: {{ContainerMemReqs "nvidia-device-plugin"}}
+          limits:
+            cpu: {{ContainerCPULimits "nvidia-device-plugin"}}
+            memory: {{ContainerMemLimits "nvidia-device-plugin"}}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        volumeMounts:
+          - name: device-plugin
+            mountPath: /var/lib/kubelet/device-plugins
+      volumes:
+        - name: device-plugin
+          hostPath:
+            path: /var/lib/kubelet/device-plugins
+      nodeSelector:
+{{- if IsKubernetesVersionGe "1.19.0-alpha.3"}}
+        kubernetes.io/os: linux
+{{else}}
+        beta.kubernetes.io/os: linux
+{{- end}}
+        accelerator: nvidia
+`)
+
+func k8sAddonsNvidiaDevicePluginYamlBytes() ([]byte, error) {
+	return _k8sAddonsNvidiaDevicePluginYaml, nil
+}
+
+func k8sAddonsNvidiaDevicePluginYaml() (*asset, error) {
+	bytes, err := k8sAddonsNvidiaDevicePluginYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "k8s/addons/nvidia-device-plugin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -34047,6 +33735,9 @@ installContainerd() {
 ensureContainerd() {
   wait_for_file 1200 1 /etc/systemd/system/containerd.service.d/exec_start.conf || exit {{GetCSEErrorCode "ERR_FILE_WATCH_TIMEOUT"}}
   wait_for_file 1200 1 /etc/containerd/config.toml || exit {{GetCSEErrorCode "ERR_FILE_WATCH_TIMEOUT"}}
+  {{- if HasKubeReservedCgroup}}
+  wait_for_file 1200 1 /etc/systemd/system/containerd.service.d/kubereserved-slice.conf|| exit {{GetCSEErrorCode "ERR_FILE_WATCH_TIMEOUT"}}
+  {{- end}}
   systemctlEnableAndStart containerd || exit {{GetCSEErrorCode "ERR_SYSTEMCTL_START_FAIL"}}
 }
 {{end}}
@@ -34056,6 +33747,10 @@ ensureDocker() {
   wait_for_file 1200 1 $DOCKER_SERVICE_EXEC_START_FILE || exit {{GetCSEErrorCode "ERR_FILE_WATCH_TIMEOUT"}}
   usermod -aG docker ${ADMINUSER}
   DOCKER_MOUNT_FLAGS_SYSTEMD_FILE=/etc/systemd/system/docker.service.d/clear_mount_propagation_flags.conf
+  {{- if HasKubeReservedCgroup}}
+  DOCKER_SLICE_FILE=/etc/systemd/system/docker.service.d/kubereserved-slice.conf
+  wait_for_file 1200 1 $DOCKER_SLICE_FILE || exit {{GetCSEErrorCode "ERR_FILE_WATCH_TIMEOUT"}}
+  {{- end}}
   DOCKER_JSON_FILE=/etc/docker/daemon.json
   for i in $(seq 1 1200); do
     if [ -s $DOCKER_JSON_FILE ]; then
@@ -34098,6 +33793,12 @@ ensureKubelet() {
   wait_for_file 1200 1 $KUBECONFIG_FILE || exit {{GetCSEErrorCode "ERR_FILE_WATCH_TIMEOUT"}}
   KUBELET_RUNTIME_CONFIG_SCRIPT_FILE=/opt/azure/containers/kubelet.sh
   wait_for_file 1200 1 $KUBELET_RUNTIME_CONFIG_SCRIPT_FILE || exit {{GetCSEErrorCode "ERR_FILE_WATCH_TIMEOUT"}}
+  {{- if HasKubeReservedCgroup}}
+  KUBERESERVED_SLICE_FILE=/etc/systemd/system/{{- GetKubeReservedCgroup -}}.slice
+  wait_for_file 1200 1 $KUBERESERVED_SLICE_FILE || exit {{GetCSEErrorCode "ERR_KUBERESERVED_SLICE_SETUP_FAIL"}}
+  KUBELET_SLICE_FILE=/etc/systemd/system/kubelet.service.d/kubereserved-slice.conf
+  wait_for_file 1200 1 $KUBELET_SLICE_FILE || exit {{GetCSEErrorCode "ERR_KUBELET_SLICE_SETUP_FAIL"}}
+  {{- end}}
   systemctlEnableAndStart kubelet || exit {{GetCSEErrorCode "ERR_KUBELET_START_FAIL"}}
   {{if HasCiliumNetworkPolicy}}
   while [ ! -f /etc/cni/net.d/05-cilium.conf ]; do
@@ -35358,7 +35059,6 @@ if [[ -n ${MASTER_NODE} ]]; then
   {{end}}
   {{- if HasClusterInitComponent}}
   if [[ $NODE_INDEX == 0 ]]; then
-    retrycmd 120 5 30 $KUBECTL apply -f /opt/azure/containers/cluster-init.yaml --server-dry-run=true || exit {{GetCSEErrorCode "ERR_CLUSTER_INIT_FAIL"}}
     retrycmd 120 5 30 $KUBECTL apply -f /opt/azure/containers/cluster-init.yaml || exit {{GetCSEErrorCode "ERR_CLUSTER_INIT_FAIL"}}
   fi
   {{end}}
@@ -36878,6 +36578,47 @@ write_files:
     {{WrapAsVariable "provisionConfigsCustomCloud"}}
 {{end}}
 
+{{- if HasKubeReservedCgroup}}
+- path: /etc/systemd/system/{{- GetKubeReservedCgroup -}}.slice
+  permissions: "0644"
+  owner: root
+  content: |
+    [Unit]
+    Description=Limited resources slice for Kubernetes services
+    Documentation=man:systemd.special(7)
+    DefaultDependencies=no
+    Before=slices.target
+    Requires=-.slice
+    After=-.slice
+    #EOF
+
+- path: /etc/systemd/system/kubelet.service.d/kubereserved-slice.conf
+  permissions: "0644"
+  owner: root
+  content: |
+    [Service]
+    Slice={{- GetKubeReservedCgroup -}}.slice
+    #EOF
+
+  {{if NeedsContainerd}}
+- path: /etc/systemd/system/containerd.service.d/kubereserved-slice.conf
+  permissions: "0644"
+  owner: root
+  content: |
+    [Service]
+    Slice={{- GetKubeReservedCgroup -}}.slice
+    #EOF
+  {{else}}
+- path: /etc/systemd/system/docker.service.d/kubereserved-slice.conf
+  permissions: "0644"
+  owner: root
+  content: |
+    [Service]
+    Slice={{- GetKubeReservedCgroup -}}.slice
+    #EOF
+  {{end}}
+{{end}}
+
 - path: /etc/systemd/system/kubelet.service
   permissions: "0644"
   encoding: gzip
@@ -37401,6 +37142,47 @@ write_files:
   owner: root
   content: !!binary |
     {{WrapAsVariable "provisionConfigsCustomCloud"}}
+{{end}}
+
+{{- if HasKubeReservedCgroup}}
+- path: /etc/systemd/system/{{- GetKubeReservedCgroup -}}.slice
+  permissions: "0644"
+  owner: root
+  content: |
+    [Unit]
+    Description=Limited resources slice for Kubernetes services
+    Documentation=man:systemd.special(7)
+    DefaultDependencies=no
+    Before=slices.target
+    Requires=-.slice
+    After=-.slice
+    #EOF
+    
+- path: /etc/systemd/system/kubelet.service.d/kubereserved-slice.conf
+  permissions: "0644"
+  owner: root
+  content: |
+    [Service]
+    Slice={{- GetKubeReservedCgroup -}}.slice
+    #EOF
+
+  {{if NeedsContainerd}}
+- path: /etc/systemd/system/containerd.service.d/kubereserved-slice.conf
+  permissions: "0644"
+  owner: root
+  content: |
+    [Service]
+    Slice={{- GetKubeReservedCgroup -}}.slice
+    #EOF
+  {{else}}
+- path: /etc/systemd/system/docker.service.d/kubereserved-slice.conf
+  permissions: "0644"
+  owner: root
+  content: |
+    [Service]
+    Slice={{- GetKubeReservedCgroup -}}.slice
+    #EOF
+  {{end}}
 {{end}}
 
 - path: /etc/systemd/system/kubelet.service
@@ -39358,7 +39140,8 @@ try
                 -MasterSubnet $global:MasterSubnet ` + "`" + `
                 -KubeServiceCIDR $global:KubeServiceCIDR ` + "`" + `
                 -VNetCIDR $global:VNetCIDR ` + "`" + `
-                -TargetEnvironment $TargetEnvironment
+                {{- /* Azure Stack has discrete Azure CNI config requirements */}}
+                -IsAzureStack {{if IsAzureStackCloud}}$true{{else}}$false{{end}}
 
             if ($TargetEnvironment -ieq "AzureStackCloud") {
                 GenerateAzureStackCNIConfig ` + "`" + `
@@ -39412,7 +39195,7 @@ try
         Out-File "c:\k\kubeletstart.ps1"
         (Get-Content "c:\AzureData\k8s\kubeproxystart.ps1") |
         Out-File "c:\k\kubeproxystart.ps1"
-        
+
         if (Test-Path $CacheDir)
         {
             Write-Log "Removing aks-engine bits cache directory"
@@ -39829,8 +39612,8 @@ Set-AzureCNIConfig
         $KubeServiceCIDR,
         [Parameter(Mandatory=$true)][string]
         $VNetCIDR,
-        [Parameter(Mandatory=$true)][string]
-        $TargetEnvironment
+        [Parameter(Mandatory=$true)][bool]
+        $IsAzureStack
     )
     # Fill in DNS information for kubernetes.
     $exceptionAddresses = @($KubeClusterCIDR, $MasterSubnet, $VNetCIDR)
@@ -39856,7 +39639,7 @@ Set-AzureCNIConfig
 
     $configJson.plugins.AdditionalArgs[1].Value.DestinationPrefix  = $KubeServiceCIDR
 
-    if ($TargetEnvironment -ieq "AzureStackCloud") {
+    if ($IsAzureStack) {
         Add-Member -InputObject $configJson.plugins[0].ipam -MemberType NoteProperty -Name "environment" -Value "mas"
     }
 
@@ -44694,7 +44477,6 @@ var _bindata = map[string]func() (*asset, error){
 	"k8s/addons/1.16/kubernetesmasteraddons-kube-dns-deployment.yaml":             k8sAddons116KubernetesmasteraddonsKubeDnsDeploymentYaml,
 	"k8s/addons/1.16/kubernetesmasteraddons-kube-proxy-daemonset.yaml":            k8sAddons116KubernetesmasteraddonsKubeProxyDaemonsetYaml,
 	"k8s/addons/1.16/kubernetesmasteraddons-kube-rescheduler-deployment.yaml":     k8sAddons116KubernetesmasteraddonsKubeReschedulerDeploymentYaml,
-	"k8s/addons/1.16/kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml":  k8sAddons116KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml,
 	"k8s/addons/1.16/kubernetesmasteraddons-pod-security-policy.yaml":             k8sAddons116KubernetesmasteraddonsPodSecurityPolicyYaml,
 	"k8s/addons/1.16/kubernetesmasteraddons-smb-flexvolume-installer.yaml":        k8sAddons116KubernetesmasteraddonsSmbFlexvolumeInstallerYaml,
 	"k8s/addons/1.16/kubernetesmasteraddons-tiller-deployment.yaml":               k8sAddons116KubernetesmasteraddonsTillerDeploymentYaml,
@@ -44714,7 +44496,6 @@ var _bindata = map[string]func() (*asset, error){
 	"k8s/addons/1.17/kubernetesmasteraddons-kube-dns-deployment.yaml":             k8sAddons117KubernetesmasteraddonsKubeDnsDeploymentYaml,
 	"k8s/addons/1.17/kubernetesmasteraddons-kube-proxy-daemonset.yaml":            k8sAddons117KubernetesmasteraddonsKubeProxyDaemonsetYaml,
 	"k8s/addons/1.17/kubernetesmasteraddons-kube-rescheduler-deployment.yaml":     k8sAddons117KubernetesmasteraddonsKubeReschedulerDeploymentYaml,
-	"k8s/addons/1.17/kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml":  k8sAddons117KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml,
 	"k8s/addons/1.17/kubernetesmasteraddons-pod-security-policy.yaml":             k8sAddons117KubernetesmasteraddonsPodSecurityPolicyYaml,
 	"k8s/addons/1.17/kubernetesmasteraddons-smb-flexvolume-installer.yaml":        k8sAddons117KubernetesmasteraddonsSmbFlexvolumeInstallerYaml,
 	"k8s/addons/1.17/kubernetesmasteraddons-tiller-deployment.yaml":               k8sAddons117KubernetesmasteraddonsTillerDeploymentYaml,
@@ -44734,7 +44515,6 @@ var _bindata = map[string]func() (*asset, error){
 	"k8s/addons/1.18/kubernetesmasteraddons-kube-dns-deployment.yaml":             k8sAddons118KubernetesmasteraddonsKubeDnsDeploymentYaml,
 	"k8s/addons/1.18/kubernetesmasteraddons-kube-proxy-daemonset.yaml":            k8sAddons118KubernetesmasteraddonsKubeProxyDaemonsetYaml,
 	"k8s/addons/1.18/kubernetesmasteraddons-kube-rescheduler-deployment.yaml":     k8sAddons118KubernetesmasteraddonsKubeReschedulerDeploymentYaml,
-	"k8s/addons/1.18/kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml":  k8sAddons118KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml,
 	"k8s/addons/1.18/kubernetesmasteraddons-pod-security-policy.yaml":             k8sAddons118KubernetesmasteraddonsPodSecurityPolicyYaml,
 	"k8s/addons/1.18/kubernetesmasteraddons-smb-flexvolume-installer.yaml":        k8sAddons118KubernetesmasteraddonsSmbFlexvolumeInstallerYaml,
 	"k8s/addons/1.18/kubernetesmasteraddons-tiller-deployment.yaml":               k8sAddons118KubernetesmasteraddonsTillerDeploymentYaml,
@@ -44754,7 +44534,6 @@ var _bindata = map[string]func() (*asset, error){
 	"k8s/addons/1.19/kubernetesmasteraddons-kube-dns-deployment.yaml":             k8sAddons119KubernetesmasteraddonsKubeDnsDeploymentYaml,
 	"k8s/addons/1.19/kubernetesmasteraddons-kube-proxy-daemonset.yaml":            k8sAddons119KubernetesmasteraddonsKubeProxyDaemonsetYaml,
 	"k8s/addons/1.19/kubernetesmasteraddons-kube-rescheduler-deployment.yaml":     k8sAddons119KubernetesmasteraddonsKubeReschedulerDeploymentYaml,
-	"k8s/addons/1.19/kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml":  k8sAddons119KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml,
 	"k8s/addons/1.19/kubernetesmasteraddons-pod-security-policy.yaml":             k8sAddons119KubernetesmasteraddonsPodSecurityPolicyYaml,
 	"k8s/addons/1.19/kubernetesmasteraddons-smb-flexvolume-installer.yaml":        k8sAddons119KubernetesmasteraddonsSmbFlexvolumeInstallerYaml,
 	"k8s/addons/1.19/kubernetesmasteraddons-tiller-deployment.yaml":               k8sAddons119KubernetesmasteraddonsTillerDeploymentYaml,
@@ -44783,12 +44562,12 @@ var _bindata = map[string]func() (*asset, error){
 	"k8s/addons/kubernetesmasteraddons-kube-dns-deployment.yaml":             k8sAddonsKubernetesmasteraddonsKubeDnsDeploymentYaml,
 	"k8s/addons/kubernetesmasteraddons-kube-proxy-daemonset.yaml":            k8sAddonsKubernetesmasteraddonsKubeProxyDaemonsetYaml,
 	"k8s/addons/kubernetesmasteraddons-kube-rescheduler-deployment.yaml":     k8sAddonsKubernetesmasteraddonsKubeReschedulerDeploymentYaml,
-	"k8s/addons/kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml":  k8sAddonsKubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml,
 	"k8s/addons/kubernetesmasteraddons-pod-security-policy.yaml":             k8sAddonsKubernetesmasteraddonsPodSecurityPolicyYaml,
 	"k8s/addons/kubernetesmasteraddons-smb-flexvolume-installer.yaml":        k8sAddonsKubernetesmasteraddonsSmbFlexvolumeInstallerYaml,
 	"k8s/addons/kubernetesmasteraddons-tiller-deployment.yaml":               k8sAddonsKubernetesmasteraddonsTillerDeploymentYaml,
 	"k8s/addons/metrics-server.yaml":                                         k8sAddonsMetricsServerYaml,
 	"k8s/addons/node-problem-detector.yaml":                                  k8sAddonsNodeProblemDetectorYaml,
+	"k8s/addons/nvidia-device-plugin.yaml":                                   k8sAddonsNvidiaDevicePluginYaml,
 	"k8s/addons/scheduled-maintenance-deployment.yaml":                       k8sAddonsScheduledMaintenanceDeploymentYaml,
 	"k8s/addons/secrets-store-csi-driver.yaml":                               k8sAddonsSecretsStoreCsiDriverYaml,
 	"k8s/armparameters.t":                                                    k8sArmparametersT,
@@ -44974,7 +44753,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				"kubernetesmasteraddons-kube-dns-deployment.yaml":             {k8sAddons116KubernetesmasteraddonsKubeDnsDeploymentYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-kube-proxy-daemonset.yaml":            {k8sAddons116KubernetesmasteraddonsKubeProxyDaemonsetYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-kube-rescheduler-deployment.yaml":     {k8sAddons116KubernetesmasteraddonsKubeReschedulerDeploymentYaml, map[string]*bintree{}},
-				"kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml":  {k8sAddons116KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-pod-security-policy.yaml":             {k8sAddons116KubernetesmasteraddonsPodSecurityPolicyYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-smb-flexvolume-installer.yaml":        {k8sAddons116KubernetesmasteraddonsSmbFlexvolumeInstallerYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-tiller-deployment.yaml":               {k8sAddons116KubernetesmasteraddonsTillerDeploymentYaml, map[string]*bintree{}},
@@ -44996,7 +44774,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				"kubernetesmasteraddons-kube-dns-deployment.yaml":             {k8sAddons117KubernetesmasteraddonsKubeDnsDeploymentYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-kube-proxy-daemonset.yaml":            {k8sAddons117KubernetesmasteraddonsKubeProxyDaemonsetYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-kube-rescheduler-deployment.yaml":     {k8sAddons117KubernetesmasteraddonsKubeReschedulerDeploymentYaml, map[string]*bintree{}},
-				"kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml":  {k8sAddons117KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-pod-security-policy.yaml":             {k8sAddons117KubernetesmasteraddonsPodSecurityPolicyYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-smb-flexvolume-installer.yaml":        {k8sAddons117KubernetesmasteraddonsSmbFlexvolumeInstallerYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-tiller-deployment.yaml":               {k8sAddons117KubernetesmasteraddonsTillerDeploymentYaml, map[string]*bintree{}},
@@ -45018,7 +44795,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				"kubernetesmasteraddons-kube-dns-deployment.yaml":             {k8sAddons118KubernetesmasteraddonsKubeDnsDeploymentYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-kube-proxy-daemonset.yaml":            {k8sAddons118KubernetesmasteraddonsKubeProxyDaemonsetYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-kube-rescheduler-deployment.yaml":     {k8sAddons118KubernetesmasteraddonsKubeReschedulerDeploymentYaml, map[string]*bintree{}},
-				"kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml":  {k8sAddons118KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-pod-security-policy.yaml":             {k8sAddons118KubernetesmasteraddonsPodSecurityPolicyYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-smb-flexvolume-installer.yaml":        {k8sAddons118KubernetesmasteraddonsSmbFlexvolumeInstallerYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-tiller-deployment.yaml":               {k8sAddons118KubernetesmasteraddonsTillerDeploymentYaml, map[string]*bintree{}},
@@ -45040,7 +44816,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				"kubernetesmasteraddons-kube-dns-deployment.yaml":             {k8sAddons119KubernetesmasteraddonsKubeDnsDeploymentYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-kube-proxy-daemonset.yaml":            {k8sAddons119KubernetesmasteraddonsKubeProxyDaemonsetYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-kube-rescheduler-deployment.yaml":     {k8sAddons119KubernetesmasteraddonsKubeReschedulerDeploymentYaml, map[string]*bintree{}},
-				"kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml":  {k8sAddons119KubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-pod-security-policy.yaml":             {k8sAddons119KubernetesmasteraddonsPodSecurityPolicyYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-smb-flexvolume-installer.yaml":        {k8sAddons119KubernetesmasteraddonsSmbFlexvolumeInstallerYaml, map[string]*bintree{}},
 				"kubernetesmasteraddons-tiller-deployment.yaml":               {k8sAddons119KubernetesmasteraddonsTillerDeploymentYaml, map[string]*bintree{}},
@@ -45070,12 +44845,12 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"kubernetesmasteraddons-kube-dns-deployment.yaml":             {k8sAddonsKubernetesmasteraddonsKubeDnsDeploymentYaml, map[string]*bintree{}},
 			"kubernetesmasteraddons-kube-proxy-daemonset.yaml":            {k8sAddonsKubernetesmasteraddonsKubeProxyDaemonsetYaml, map[string]*bintree{}},
 			"kubernetesmasteraddons-kube-rescheduler-deployment.yaml":     {k8sAddonsKubernetesmasteraddonsKubeReschedulerDeploymentYaml, map[string]*bintree{}},
-			"kubernetesmasteraddons-nvidia-device-plugin-daemonset.yaml":  {k8sAddonsKubernetesmasteraddonsNvidiaDevicePluginDaemonsetYaml, map[string]*bintree{}},
 			"kubernetesmasteraddons-pod-security-policy.yaml":             {k8sAddonsKubernetesmasteraddonsPodSecurityPolicyYaml, map[string]*bintree{}},
 			"kubernetesmasteraddons-smb-flexvolume-installer.yaml":        {k8sAddonsKubernetesmasteraddonsSmbFlexvolumeInstallerYaml, map[string]*bintree{}},
 			"kubernetesmasteraddons-tiller-deployment.yaml":               {k8sAddonsKubernetesmasteraddonsTillerDeploymentYaml, map[string]*bintree{}},
 			"metrics-server.yaml":                                         {k8sAddonsMetricsServerYaml, map[string]*bintree{}},
 			"node-problem-detector.yaml":                                  {k8sAddonsNodeProblemDetectorYaml, map[string]*bintree{}},
+			"nvidia-device-plugin.yaml":                                   {k8sAddonsNvidiaDevicePluginYaml, map[string]*bintree{}},
 			"scheduled-maintenance-deployment.yaml":                       {k8sAddonsScheduledMaintenanceDeploymentYaml, map[string]*bintree{}},
 			"secrets-store-csi-driver.yaml":                               {k8sAddonsSecretsStoreCsiDriverYaml, map[string]*bintree{}},
 		}},

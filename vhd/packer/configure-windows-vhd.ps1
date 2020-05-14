@@ -83,8 +83,15 @@ function Get-FilesToCacheOnVHD
             $global:containerdPackageUrl
         );
         "c:\akse-cache\win-k8s\" = @(
-            "https://acs-mirror.azureedge.net/wink8s/azs-v1.14.7-1int.zip",
-            "https://acs-mirror.azureedge.net/wink8s/azs-v1.14.8-1int.zip",
+            "https://kubernetesartifacts.azureedge.net/kubernetes/v1.14.7-azs/windowszip/v1.14.7-azs-1int.zip",
+            "https://kubernetesartifacts.azureedge.net/kubernetes/v1.14.8-azs/windowszip/v1.14.8-azs-1int.zip",
+            "https://kubernetesartifacts.azureedge.net/kubernetes/v1.15.10-azs/windowszip/v1.15.10-azs-1int.zip",
+            "https://kubernetesartifacts.azureedge.net/kubernetes/v1.15.11-azs/windowszip/v1.15.11-azs-1int.zip",
+            "https://kubernetesartifacts.azureedge.net/kubernetes/v1.15.12-azs/windowszip/v1.15.12-azs-1int.zip",
+            "https://kubernetesartifacts.azureedge.net/kubernetes/v1.16.8-azs/windowszip/v1.16.8-azs-1int.zip",
+            "https://kubernetesartifacts.azureedge.net/kubernetes/v1.16.9-azs/windowszip/v1.16.9-azs-1int.zip",
+            "https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.4-azs/windowszip/v1.17.4-azs-1int.zip",
+            "https://kubernetesartifacts.azureedge.net/kubernetes/v1.17.5-azs/windowszip/v1.17.5-azs-1int.zip",
             "https://kubernetesartifacts.azureedge.net/kubernetes/v1.14.7/windowszip/v1.14.7-1int.zip",
             "https://kubernetesartifacts.azureedge.net/kubernetes/v1.14.8/windowszip/v1.14.8-1int.zip",
             "https://kubernetesartifacts.azureedge.net/kubernetes/v1.15.10/windowszip/v1.15.10-1int.zip",
@@ -102,9 +109,9 @@ function Get-FilesToCacheOnVHD
             "https://kubernetesartifacts.azureedge.net/kubernetes/v1.19.0-alpha.3/windowszip/v1.19.0-alpha.3-1int.zip"
         );
         "c:\akse-cache\win-vnet-cni\" = @(
-            "https://kubernetesartifacts.azureedge.net/azure-cni/v1.0.30/binaries/azure-vnet-cni-windows-amd64-v1.0.30.zip",
             "https://kubernetesartifacts.azureedge.net/azure-cni/v1.0.33/binaries/azure-vnet-cni-windows-amd64-v1.0.33.zip",
-            "https://kubernetesartifacts.azureedge.net/azure-cni/v1.1.0/binaries/azure-vnet-cni-windows-amd64-v1.1.0.zip"
+            "https://kubernetesartifacts.azureedge.net/azure-cni/v1.1.0/binaries/azure-vnet-cni-windows-amd64-v1.1.0.zip",
+            "https://kubernetesartifacts.azureedge.net/azure-cni/v1.1.2/binaries/azure-vnet-cni-singletenancy-windows-amd64-v1.1.2.zip"
         )
     }
 
@@ -177,7 +184,8 @@ function Install-WindowsPatches
     # Windows Server 2019 update history can be found at https://support.microsoft.com/en-us/help/4464619
     # then you can get download links by searching for specific KBs at http://www.catalog.update.microsoft.com/home.aspx
 
-    $patchUrls = @()
+    # KB4551853 contains May 2020 cumulative updates for Windows Server 2019
+    $patchUrls = @("http://download.windowsupdate.com/c/msdownload/update/software/secu/2020/05/windows10.0-kb4551853-x64_ce1ea7def481ee2eb8bba6db49ddb42e45cba54f.msu")
 
     foreach ($patchUrl in $patchUrls)
     {
